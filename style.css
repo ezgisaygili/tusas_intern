@@ -1,0 +1,21 @@
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card.bg-color-0 {
+    background: #df0416;
+}
+  
+.card.bg-color-1 {
+    background: #17d13f;
+}
+  
+.card.bg-color-2 {
+    background: #cbe728;
+}
+
+.card {
+    background-color: rgba(0, 0, 0, 0.2);
+}
