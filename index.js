@@ -1,11 +1,11 @@
 $(document).ready(function () {
     setInterval(function () {
-        writeDataToDatabase('bench1');
-        writeDataToDatabase('bench2');
-        writeDataToDatabase('bench3');
-        writeDataToDatabase('bench4');
-        writeDataToDatabase('bench5');
-    }, 5000);
+        writeDataToDatabase();
+        writeDataToDatabase();
+        writeDataToDatabase();
+        writeDataToDatabase();
+        writeDataToDatabase();
+    }, 1000);
 
     setInterval(function () {
         writeDataToTable('bench1');
@@ -13,11 +13,15 @@ $(document).ready(function () {
         writeDataToTable('bench3');
         writeDataToTable('bench4');
         writeDataToTable('bench5');
-    }, 5000);
+    }, 1000);
 
     setInterval(function () {
-        writeDataOnCards();
-    }, 5000);
+        writeDataOnCards('bench1');
+        writeDataOnCards('bench2');
+        writeDataOnCards('bench3');
+        writeDataOnCards('bench4');
+        writeDataOnCards('bench5');
+    }, 1000);
 
 });
 
@@ -28,43 +32,49 @@ function writeDataToTable(benchNo) {
         dataType: 'JSON',
         data: {'benchNo': benchNo},
         success: function (response) {
-            /*console.log(response);
-            var bench1Energy = response[0].energy;
-            var bench1ProgramStatus = response[0].programStatus;
-            var bench1programStatus = response[0].programStatus;
-            var bench1Performance = response[0].performance;
-            var bench1stopCondition = response[0].stopCondition;
-            var bench1axis = response[0].axis;
-            if (bench1Energy == '1') {
-                $('#bench1Card').css('background-color', 'green');
-                $('#bench1Status').text(bench1Performance);
+
+            var len = response.length;
+            var benchPerf = 0;
+            var benchAv = 0;
+
+            for (var i = 0; i < len; i++) {
+                if(response[i].performance != 0) {
+                    benchPerf += parseInt(response[i].performance); 
+                }
+                if(response[i].energy == 1 && response[i].programStatus != 3) {
+                    benchAv++;
+                }             
+            } 
+            
+            var quality = 1;
+            var performance = benchPerf / benchAv;
+            var availability = benchAv / len;
+            var oee = parseInt(quality * performance * availability);
+
+           // console.log(performance);
+           // console.log(availability);  
+
+            if(benchNo == 'bench1') {
+                $('#bench1OEE').text("OEE: %");
+                $('#bench1OEE').append(oee);
+            } 
+            else if(benchNo == 'bench2') {
+                $('#bench2OEE').text("OEE: %");
+                $('#bench2OEE').append(oee);
             }
-            else {
-                $('#bench1Card').css('background-color', 'white');
+            else if(benchNo == 'bench3') {
+                $('#bench3OEE').text("OEE: %");
+                $('#bench3OEE').append(oee);
+            }  
+            else if(benchNo == 'bench4') {
+                $('#bench4OEE').text("OEE: %");
+                $('#bench4OEE').append(oee);
             }
-            //console.log(bench1Performance);
-            $('#bench1OEE').text(bench1Performance);*/
-            /* var len = response.length;
-             for (var i = 0; i < len; i++) {
-                 var actionTime = response[i].actionTime;
-                 var energy = response[i].energy;
-                 var programStatus = response[i].programStatus;
-                 var performance = response[i].performance;
-                 var stopCondition = response[i].stopCondition;
-                 var axis = response[i].axis;
- 
-                 var tr_str = "<tr>" +
-                     "<td align='center'>" + (i + 1) + "</td>" +
-                     "<td align='center'>" + actionTime + "</td>" +
-                     "<td align='center'>" + energy + "</td>" +
-                     "<td align='center'>" + programStatus + "</td>" +
-                     "<td align='center'>" + performance + "</td>" +
-                     "<td align='center'>" + stopCondition + "</td>" +
-                     "<td align='center'>" + axis + "</td>" +
-                     "</tr>";
- 
-                 //$("#benchTable1 tbody").append(tr_str);                    
-             }*/
+            else{
+                $('#bench5OEE').text("OEE: %");
+                $('#bench5OEE').append(oee);
+            } 
+
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log(jqXHR + textStatus + errorThrown);
@@ -88,52 +98,58 @@ function writeDataToDatabase() {
 }
 
 
-
-function writeDataOnCards() {
+function writeDataOnCards(benchNo) {
     $.ajax({
         url: 'livefromkepserver.php',
         type: 'POST',
         dataType: 'JSON',
         data: {'benchNo': benchNo},
         success: function (response) {
-            if(benchNo == 'bench1') {
+
+            var stopCond = calculateStopCondition(response);
+
+            if(response.benchNo == 'bench1') {
                 if(response.currentStatus == 1) {
                     $('#bench1Card').css('background-color', 'green');
                     $('#bench1Status').text("Working");
                 }
                 else {
                     $('#bench1Card').css('background-color', 'red');
-                    $('#bench1Status').text("Stop condition: " . response.currentStopCondition);
+                    $('#bench1Status').text(stopCond);
+                    //$('#bench1Status').append(stopCond);
                 }
             }
-            else if(benchNo == 'bench2') {
+            else if(response.benchNo == 'bench2') {
                 if(response.currentStatus == 1) {
                     $('#bench2Card').css('background-color', 'green');
                     $('#bench2Status').text("Working");
                 }
                 else {
                     $('#bench2Card').css('background-color', 'red');
-                    $('#bench2Status').text("Stop condition: " . response.currentStopCondition);
+                    $('#bench2Status').text(stopCond);
+                    //$('#bench2Status').append(stopCond);
                 }
             }
-            else if(benchNo == 'bench3') {
+            else if(response.benchNo == 'bench3') {
                 if(response.currentStatus == 1) {
                     $('#bench3Card').css('background-color', 'green');
                     $('#bench3Status').text("Working");
                 }
                 else {
                     $('#bench3Card').css('background-color', 'red');
-                    $('#bench3Status').text("Stop condition: " . response.currentStopCondition);
+                    $('#bench3Status').text(stopCond);
+                    //$('#bench3Status').append(stopCond);
                 }
             }
-            else if(benchNo == 'bench4') {
+            else if(response.benchNo == 'bench4') {
                 if(response.currentStatus == 1) {
                     $('#bench4Card').css('background-color', 'green');
                     $('#bench4Status').text("Working");
                 }
                 else {
                     $('#bench4Card').css('background-color', 'red');
-                    $('#bench4Status').text("Stop condition: " . response.currentStopCondition);
+                    $('#bench4Status').text(stopCond);
+                    //$('#bench4Status').append(stopCond);
                 }
             }
             else{
@@ -143,7 +159,8 @@ function writeDataOnCards() {
                 }
                 else {
                     $('#bench5Card').css('background-color', 'red');
-                    $('#bench5Status').text("Stop condition: " . response.currentStopCondition);
+                    $('#bench5Status').text(stopCond);
+                    //$('#bench5Status').append(stopCond);
                 }
             }
 
@@ -153,4 +170,25 @@ function writeDataOnCards() {
         }
     });
 
+}
+
+function calculateStopCondition(response) {
+    var x = response.currentStopCondition;
+    var resp;
+    if(x ==1){
+        resp = "Program Failure";
+    }
+    else if(x==2){
+        resp = "Breakdown";
+    }
+    else if(x==3){
+        resp = "Tool Errors";
+    }
+    else if(x==4){
+        resp = "Program Ended";
+    }
+    else{
+        resp = "Idle";
+    }
+    return resp;
 }

@@ -1,13 +1,22 @@
 <?php
-include 'readvaluesfromkepserver.php';
-
-$currentStatus = 2;
-$currentStopCondition = 0;
 
 if (isset($_POST['benchNo'])) {
     $benchNo = $_POST['benchNo'];
+
+    $currentStatus = 2;
+    $currentStopCondition = 0;
+
     $benchData = getDataFromKepserver($benchNo);
+
+    $arr = array(
+        'benchNo' => $benchNo,
+        'currentStatus' => $currentStatus,
+        'currentStopCondition' => $currentStopCondition
+     );
+
+    echo json_encode($arr);
 }
+
 
 function getDataFromKepserver($benchNo) {
     include 'readvaluesfromkepserver.php';
@@ -34,10 +43,13 @@ function calculateStatus($energyUrl, $programStatusUrl, $stopCondition) {
     $programStatus = readValue($programStatusUrl);
     $stopCondition = readValue($stopCondition);
     if($energy == 1 && $programStatus != 3) {
+        global $currentStatus;
         $currentStatus = 1;
     }
     else {
+        global $currentStatus;
         $currentStatus = 0;
+        global $currentStopCondition;
         $currentStopCondition = $stopCondition;
     }
 

@@ -70,6 +70,6 @@ function writeDatabase($conn, $currentTime, $energyUrl, $programStatusUrl, $perf
 //    echo $lastAxis . ' - ' . $axis . '<br>';
 
     if ($energy != $lastEnergy || $programStatus != $lastProgramStatus || $performance != $lastPerformance || $stopCondition != $lastStopCondition || $axis != $lastAxis) {
-        $result = $conn->query("INSERT INTO $databaseTable (actionTime, energy, programStatus, performance, stopCondition, axis) VALUES ('$currentTime', '$energy', '$programStatus', '$performance', '$stopCondition', '$axis')");
+        $result = $conn->query("INSERT IGNORE INTO $databaseTable (actionTime, energy, programStatus, performance, stopCondition, axis) VALUES ('$currentTime', '$energy', '$programStatus', '$performance', '$stopCondition', '$axis')");
     }
 }
